@@ -1,61 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <title>Books</title>
-    <script src="Books.js"></script>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Books</title>
+
+  <!-- Inter font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-      <!-- New Book button -->
-    <div id="controls">
-        <button id="new-book-btn">New Book</button>
-    </div>
+  <header id="controls">
+    <button id="new-book-btn" type="button" aria-haspopup="dialog">New Book</button>
+  </header>
 
-    <!-- library container where .book-card elements will be rendered -->
-    <div id="library-container">
-        <!-- Example static card (optional) -->
-        <div class="book-card" style="display:none;">
-            <h3>Sample Title</h3>
-            <p>Author: Sample Author</p>
-            <p>Pages: 0</p>
-            <p>Status: Not read yet</p>
-            <button>Toggle Read</button>
-            <button>Remove</button>
-        </div>
-    </div>
-    <dialog id="new-book-dialog" aria-labelledby="new-book-title">
-        <form id="new-book-form" method="dialog">
-            <h2 id="new-book-title">Add New Book</h2>
+  <main>
+    <section id="library-container" aria-live="polite" aria-label="Book library"></section>
+  </main>
 
-            <label>
-                Title
-                <input name="title" type="text" required />
-            </label>
+  <!-- dialog form -->
+  <dialog id="new-book-dialog" aria-labelledby="new-book-title">
+    <form id="new-book-form" method="dialog">
+      <h2 id="new-book-title">Add New Book</h2>
 
-            <label>
-                Author
-                <input name="author" type="text" required />
-            </label>
+      <label>
+        Title
+        <input name="title" type="text" required />
+      </label>
 
-            <label>
-                Pages
-                <input name="pages" type="number" min="0" />
-            </label>
+      <label>
+        Author
+        <input name="author" type="text" required />
+      </label>
 
-            <label>
-                Genre
-                <input name="genre" type="text" />
-            </label>
+      <label>
+        Pages
+        <input name="pages" type="number" min="0" />
+      </label>
 
-            <label>
-                <input name="isRead" type="checkbox" /> Read
-            </label>
+      <label>
+        Genre
+        <input name="genre" type="text" />
+      </label>
 
-            <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:10px;">
-                <button type="submit">Add Book</button>
-                <button type="button" id="cancel-btn">Cancel</button>
+      <label class="row">
+        <input name="isRead" type="checkbox" /> Read
+      </label>
+
+      <div class="form-actions">
+        <button type="button" id="cancel-new-book">Cancel</button>
+        <button type="submit">Add Book</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="Books.js"></script>
 </body>
 </html>

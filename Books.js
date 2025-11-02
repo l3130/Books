@@ -1,26 +1,55 @@
 // Clean, self-contained library script
-
-const myLibrary = [];
+// ...existing code...
+const myLibrary = []; // kept for backward visibility if needed
 
 function uuidFallback() {
-  // simple fallback if crypto.randomUUID isn't available
   return 'id-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 9);
 }
 
-function Book(title, author, pages = 0, isRead = false, genre = '') {
-  this.id = (crypto && typeof crypto.randomUUID === 'function') ? crypto.randomUUID() : uuidFallback();
-  this.title = title;
-  this.author = author;
-  this.pages = Number(pages) || 0;
-  this.isRead = Boolean(isRead);
-  this.genre = genre;
+class Book {
+  constructor(title, author, pages = 0, isRead = false, genre = '') {
+    this.id = (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function')
+      ? crypto.randomUUID()
+      : uuidFallback();
+    this.title = title;
+    this.author = author;
+    this.pages = Number(pages) || 0;
+    this.isRead = Boolean(isRead);
+    this.genre = genre;
+  }
 }
 
-function addBookToLibrary(title, author, pages, isRead, genre) {
-  const book = new Book(title, author, pages, isRead, genre);
-  myLibrary.push(book);
-  return book;
+class Library {
+  constructor() {
+    this.items = [];
+  }
+
+  add(title, author, pages = 0, isRead = false, genre = '') {
+    const book = new Book(title, author, pages, isRead, genre);
+    this.items.push(book);
+    return book;
+  }
+
+  remove(id) {
+    const idx = this.items.findIndex(b => b.id === id);
+    if (idx !== -1) this.items.splice(idx, 1);
+  }
+
+  toggleRead(id) {
+    const book = this.items.find(b => b.id === id);
+    if (book) book.isRead = !book.isRead;
+  }
+
+  clear() {
+    this.items.length = 0;
+  }
+
+  find(id) {
+    return this.items.find(b => b.id === id);
+  }
 }
+
+const library = new Library();
 
 function escapeHtml(str = '') {
   return String(str)
@@ -36,7 +65,7 @@ function displayBooks() {
   if (!container) return;
   container.innerHTML = '';
 
-  if (myLibrary.length === 0) {
+  if (library.items.length === 0) {
     const empty = document.createElement('div');
     empty.className = 'empty-state';
     empty.textContent = 'No books in your library. Click "New Book" to add one.';
@@ -44,7 +73,7 @@ function displayBooks() {
     return;
   }
 
-  myLibrary.forEach(book => {
+  library.items.forEach(book => {
     const card = document.createElement('article');
     card.className = 'book-card';
     card.dataset.bookId = book.id;
@@ -64,19 +93,13 @@ function displayBooks() {
 }
 
 function removeBook(id) {
-  const idx = myLibrary.findIndex(b => b.id === id);
-  if (idx !== -1) {
-    myLibrary.splice(idx, 1);
-    displayBooks();
-  }
+  library.remove(id);
+  displayBooks();
 }
 
 function toggleRead(id) {
-  const book = myLibrary.find(b => b.id === id);
-  if (book) {
-    book.isRead = !book.isRead;
-    displayBooks();
-  }
+  library.toggleRead(id);
+  displayBooks();
 }
 
 // Delegated event handling for card buttons
@@ -99,13 +122,13 @@ document.addEventListener('DOMContentLoaded', () => {
   function showDialog() {
     if (!dlg) return;
     if (typeof dlg.showModal === 'function') dlg.showModal();
-    else dlg.setAttribute('open', ''); // fallback
+    else dlg.setAttribute('open', '');
   }
 
   function closeDialog() {
     if (!dlg) return;
     if (typeof dlg.close === 'function') dlg.close();
-    else dlg.removeAttribute('open'); // fallback
+    else dlg.removeAttribute('open');
   }
 
   if (openBtn) openBtn.addEventListener('click', showDialog);
@@ -113,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (form) {
     form.addEventListener('submit', (ev) => {
-      ev.preventDefault(); // prevent default dialog/form navigation
+      ev.preventDefault();
 
       const fd = new FormData(form);
       const title = (fd.get('title') || '').toString().trim();
@@ -123,12 +146,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const isRead = fd.get('isRead') === 'on' || fd.get('isRead') === 'true';
 
       if (!title || !author) {
-        // minimal validation
         alert('Please provide both title and author.');
         return;
       }
 
-      addBookToLibrary(title, author, pages, isRead, genre);
+      library.add(title, author, pages, isRead, genre);
       displayBooks();
       form.reset();
       closeDialog();
@@ -136,9 +158,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // sample data
-  addBookToLibrary('The Hobbit', 'J.R.R. Tolkien', 295, false, 'Fantasy');
-  addBookToLibrary('1984', 'George Orwell', 328, true, 'Dystopian');
-  addBookToLibrary('Pride and Prejudice', 'Jane Austen', 432, true, 'Romance');
+  library.add('The Hobbit', 'J.R.R. Tolkien', 295, false, 'Fantasy');
+  library.add('1984', 'George Orwell', 328, true, 'Dystopian');
+  library.add('Pride and Prejudice', 'Jane Austen', 432, true, 'Romance');
 
   displayBooks();
 });
+// ...existing code...
